@@ -32,17 +32,17 @@ client.query('select * from users where ? = id', [42], callback)
 
 ### Usage
 
-** removeConditionals **
+**removeConditionals**
 
 Remove checks for the callback being a function. And maybe other conditionals in the future.
 
-** client.exec **
+**client.exec**
 
 Send a query that does not include arguments
 
 `client.query('select * from users where 42 = id', callback)`
 
-** client.query **
+**client.query**
 
 Send a query that does have arguments, in the form of an array
 
