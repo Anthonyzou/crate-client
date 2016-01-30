@@ -14,25 +14,27 @@ crateClient = function crateClient(endpoints, options) {
   if (util.isString(endpoints)) {
     this.pool = new Pool(http, [endpoints], options);
   } else if (util.isArray(endpoints)) {
-    this.pool = new Pool(http, [endpoints], options);
+    this.pool = new Pool(http, endpoints, options);
   }
 }
 
-crateClient.prototype.exec = function(statment, args, cb) {
+crateClient.prototype.exec = function(statment, cb) {
+  console.log({
+    stmt: statment,
+  })
   this.pool.request({
     method: 'POST',
-    path: '/_sql'
-  }, {
+    path: '/_sql',
+    headers : {
+      'Content-Type':'application/json'
+    }
+  }, JSON.stringify({
     stmt: statment,
-    args: args
-  }, function(err, response, body) {
-    if (!util.isfunction(cb)) {
-      return;
+  }), function(err, response, body) {
+    console.log(err, response.statusCode, body)
+    if (util.isFunction(cb)) {
+      return cb(err, response,  body);;
     }
-    if (err || response !== 200) {
-      return cb(err, response, body);
-    }
-    return cb(null, body);
   });
   return this;
 };
