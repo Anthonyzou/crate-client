@@ -5,16 +5,19 @@ spawn = require('child_process').spawn
 
 describe 'crate', ->
   client = undefined
-  before ->
+  before (done) ->
     client = new Crate(['localhost:4200' ])
-    return
+    done()
 
+  after (done) ->
+    # return done()
+    client.exec "drop table if exists demo", done
 
   # test cases
   describe 'create table', ->
     it 'call without args', (done) ->
       client.exec "
-          create if exists table demo (
+          create table if not exists demo (
             name string,
             obj object (dynamic) as (
                 age int
@@ -22,21 +25,41 @@ describe 'crate', ->
             tags array (string)
           )
         ", (err, results, data) ->
+          assert.equal(200, results)
+          assert.equal(1, data.rowcount)
           done()
 
-
-  describe 'create table', ->
+  describe 'insert into table', ->
     it 'another call without args', (done) ->
       client.exec "
         insert into demo (name, obj, tags) values
         ('Trillian',{age = 39, gender='female'},['mathematician', 'astrophysicist'])
       ", (err, results, data) ->
+        assert.equal(200, results)
+        assert.equal(1, data.rowcount)
+        done()
+    it 'insert with args', (done) ->
+      client.query "insert into demo (name, obj, tags) values (?,?,?)"
+      , ['Trillian1',{age : 3, gender:'male'},['teacher']]
+      , (err, results, data) ->
+        assert.equal(200, results)
+        assert.equal(1, data.rowcount)
         done()
 
-  describe 'create table', ->
-    it 'another call without args', (done) ->
-      client.exec "
-        insert into demo (name, obj, tags) values
-        ('Trillian',{age = 39, gender='female'},['mathematician', 'astrophysicist'])
-      ", (err, results, data) ->
-        done()
+    it 'give some time to crate to process inserts', (done)->
+      setTimeout done, 1500
+
+  describe "query results", ->
+    it 'query without args', (done) ->
+        client.exec "select * from demo"
+        , (err, results, data) ->
+          assert.equal(200, results)
+          assert.equal(2, data.rowcount)
+          done()
+    it 'query with args', (done) ->
+        client.query "select * from demo"
+        , ['female']
+        , (err, results, data) ->
+          assert.equal(200, results)
+          assert.equal(2, data.rowcount)
+          done()
