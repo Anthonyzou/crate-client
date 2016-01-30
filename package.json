@@ -1,12 +1,22 @@
 {
   "name": "crate-client",
   "version": "0.0.0",
-  "description": "A crate client with clustering",
+  "description": "A crate client with pooled backends",
   "main": "index.js",
   "scripts": {
     "test": "mocha --compilers coffee:coffee-script/register"
   },
-  "author": "",
+  "keywords": [
+    "javascript",
+    "crate",
+    "poolee",
+    "pool"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Anthonyzou/crate-client.git"
+  },
+  "author": "Anthony Ou",
   "license": "ISC",
   "dependencies": {
     "coffee-script": "^1.10.0",
